@@ -32,6 +32,13 @@ export const ClientForm = ({ client, availableTags, onSubmit, onCreateTag }: Cli
   const [selectedTags, setSelectedTags] = useState<Tag[]>(client?.tags || []);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
+  // Ensure that selectedTags is updated when client.tags changes
+  useEffect(() => {
+    if (client?.tags) {
+      setSelectedTags(client.tags);
+    }
+  }, [client?.tags]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -81,7 +88,7 @@ export const ClientForm = ({ client, availableTags, onSubmit, onCreateTag }: Cli
   
   const handleCreateTag = (tag: Tag) => {
     onCreateTag(tag);
-    setSelectedTags([...selectedTags, tag]);
+    setSelectedTags(prev => [...prev, tag]);
     
     toast({
       title: "Tag criada",
