@@ -18,7 +18,7 @@ const CalendarPage = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
 
-  // Load all clients and their tasks
+  // Load all clients and their tasks from localStorage
   useEffect(() => {
     const loadedClients = getClients();
     setClients(loadedClients);
@@ -44,7 +44,7 @@ const CalendarPage = () => {
     if (view === "day") {
       filtered = filtered.filter(task => {
         if (!task.dueDate) return false;
-        return task.dueDate.toDateString() === selectedDate.toDateString();
+        return new Date(task.dueDate).toDateString() === selectedDate.toDateString();
       });
     } else if (view === "week") {
       const weekStart = new Date(selectedDate);
@@ -55,14 +55,16 @@ const CalendarPage = () => {
 
       filtered = filtered.filter(task => {
         if (!task.dueDate) return false;
-        return task.dueDate >= weekStart && task.dueDate <= weekEnd;
+        const taskDate = new Date(task.dueDate);
+        return taskDate >= weekStart && taskDate <= weekEnd;
       });
     } else if (view === "month") {
       filtered = filtered.filter(task => {
         if (!task.dueDate) return false;
+        const taskDate = new Date(task.dueDate);
         return (
-          task.dueDate.getMonth() === selectedDate.getMonth() &&
-          task.dueDate.getFullYear() === selectedDate.getFullYear()
+          taskDate.getMonth() === selectedDate.getMonth() &&
+          taskDate.getFullYear() === selectedDate.getFullYear()
         );
       });
     }
@@ -104,7 +106,7 @@ const CalendarPage = () => {
               </div>
               {task.dueDate && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  Data: {format(task.dueDate, "dd/MM/yyyy")}
+                  Data: {format(new Date(task.dueDate), "dd/MM/yyyy")}
                 </p>
               )}
             </CardContent>

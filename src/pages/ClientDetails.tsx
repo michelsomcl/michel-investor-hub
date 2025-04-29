@@ -2,13 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { Layout } from "../components/Layout";
 import { useNavigate, useParams } from "react-router-dom";
-import { mockClients, mockTags } from "../data/mockData";
 import { Button } from "@/components/ui/button";
 import { ClientDetails as ClientDetailsComponent } from "../components/ClientDetails";
 import { ClientForm } from "../components/ClientForm";
 import { Client, ServiceHistory, Task, Tag } from "../types";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import { getClients, saveClients, getTags } from "../services/localStorage";
 
 const ClientDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,14 +16,20 @@ const ClientDetailsPage = () => {
   
   const [client, setClient] = useState<Client | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [tags, setTags] = useState<Tag[]>(mockTags);
+  const [tags, setTags] = useState<Tag[]>([]);
   
+  // Load client and tags from localStorage
   useEffect(() => {
+    // Get all clients from localStorage
+    const clients = getClients();
+    const loadedTags = getTags();
+    
     // Find client with the given ID
-    const foundClient = mockClients.find(c => c.id === id);
+    const foundClient = clients.find(c => c.id === id);
     
     if (foundClient) {
       setClient(foundClient);
+      setTags(loadedTags);
     } else {
       navigate("/clients", { replace: true });
       toast({
@@ -43,7 +49,15 @@ const ClientDetailsPage = () => {
       updatedAt: new Date()
     };
     
+    // Update client in state
     setClient(updatedClient);
+    
+    // Update client in localStorage
+    const clients = getClients();
+    const updatedClients = clients.map(c => 
+      c.id === client.id ? updatedClient : c
+    );
+    saveClients(updatedClients);
     
     toast({
       title: "Atendimento registrado",
@@ -60,7 +74,15 @@ const ClientDetailsPage = () => {
       updatedAt: new Date()
     };
     
+    // Update client in state
     setClient(updatedClient);
+    
+    // Update client in localStorage
+    const clients = getClients();
+    const updatedClients = clients.map(c => 
+      c.id === client.id ? updatedClient : c
+    );
+    saveClients(updatedClients);
     
     toast({
       title: "Tarefa adicionada",
@@ -81,7 +103,15 @@ const ClientDetailsPage = () => {
       updatedAt: new Date()
     };
     
+    // Update client in state
     setClient(updatedClient);
+    
+    // Update client in localStorage
+    const clients = getClients();
+    const updatedClients = clients.map(c => 
+      c.id === client.id ? updatedClient : c
+    );
+    saveClients(updatedClients);
     
     toast({
       title: completed ? "Tarefa concluída" : "Tarefa reaberta",
@@ -92,7 +122,16 @@ const ClientDetailsPage = () => {
   };
   
   const handleClientUpdate = (updatedClient: Client) => {
+    // Update client in state
     setClient(updatedClient);
+    
+    // Update client in localStorage
+    const clients = getClients();
+    const updatedClients = clients.map(c => 
+      c.id === updatedClient.id ? updatedClient : c
+    );
+    saveClients(updatedClients);
+    
     setIsEditing(false);
     
     toast({
