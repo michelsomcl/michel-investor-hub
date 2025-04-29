@@ -6,6 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatPhoneNumber } from "../lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Trash } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { getClients, saveClients } from "../services/localStorage";
 
 interface ClientListProps {
   clients: Client[];
@@ -13,6 +18,26 @@ interface ClientListProps {
 
 export const ClientList = ({ clients }: ClientListProps) => {
   const navigate = useNavigate();
+
+  const handleDeleteClient = (clientId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    
+    // Get current clients and filter out the one to delete
+    const currentClients = getClients();
+    const updatedClients = currentClients.filter(client => client.id !== clientId);
+    
+    // Save updated clients list to localStorage
+    saveClients(updatedClients);
+    
+    // Show confirmation toast
+    toast({
+      title: "Cliente excluído",
+      description: "O cliente foi excluído com sucesso."
+    });
+    
+    // Force a page reload to refresh the client list
+    window.location.reload();
+  };
 
   if (clients.length === 0) {
     return (
@@ -33,6 +58,7 @@ export const ClientList = ({ clients }: ClientListProps) => {
             <TableHead>Fonte</TableHead>
             <TableHead>Tags</TableHead>
             <TableHead>Cadastro</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -61,6 +87,24 @@ export const ClientList = ({ clients }: ClientListProps) => {
               </TableCell>
               <TableCell className="text-sm text-muted-foreground">
                 {client.createdAt.toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem 
+                      className="text-destructive focus:text-destructive cursor-pointer"
+                      onClick={(e) => handleDeleteClient(client.id, e)}
+                    >
+                      <Trash className="mr-2 h-4 w-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}

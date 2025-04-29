@@ -1,16 +1,23 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout } from "../components/Layout";
 import { ClientList } from "../components/ClientList";
-import { mockClients, mockTags } from "../data/mockData";
 import { useSearchParams } from "react-router-dom";
 import { ClientsHeader } from "../components/ClientsHeader";
 import { ClientFilters } from "../components/ClientFilters";
 import { useClientFilters } from "../hooks/useClientFilters";
+import { getClients, getTags } from "../services/localStorage";
 
 const Clients = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [clients] = useState(mockClients);
+  const [clients, setClients] = useState(getClients());
+  const [tags, setTags] = useState(getTags());
+  
+  // Refresh tags from localStorage when component mounts
+  useEffect(() => {
+    const loadedTags = getTags();
+    setTags(loadedTags);
+  }, []);
   
   const {
     filteredClients,
@@ -67,7 +74,7 @@ const Clients = () => {
           searchTerm={searchTerm}
           selectedTagId={selectedTagId}
           selectedLevel={selectedLevel}
-          tags={mockTags}
+          tags={tags}
           onSearch={onSearch}
           onTagChange={onTagChange}
           onLevelChange={handleLevelChange}

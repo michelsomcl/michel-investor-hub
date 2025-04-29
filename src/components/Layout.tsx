@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Sidebar } from "./Sidebar";
-import { useToast } from "@/hooks/use-toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,9 +8,11 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 overflow-auto p-6">{children}</main>
+      <div className="flex-1 p-8 bg-slate-50">
+        {children}
+      </div>
     </div>
   );
 };
