@@ -5,13 +5,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tag } from "../types";
 import { generateId } from "../lib/utils";
+import { TagForm } from "./TagForm";
 
 interface QuickTagModalProps {
   isOpen: boolean;
@@ -54,27 +51,13 @@ export const QuickTagModal = ({ isOpen, onClose, onCreateTag }: QuickTagModalPro
           <DialogTitle>Nova Tag</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="tagName">Nome da Tag</Label>
-            <Input
-              id="tagName"
-              value={tagName}
-              onChange={(e) => setTagName(e.target.value)}
-              placeholder="Ex: VIP, Ativo, Aposentado..."
-              required
-            />
-          </div>
-          
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="btn-primary">
-              Salvar
-            </Button>
-          </DialogFooter>
-        </form>
+        <TagForm 
+          tagName={tagName}
+          setTagName={setTagName}
+          onSubmit={handleSubmit}
+          onClose={handleClose}
+          isEditing={false}
+        />
       </DialogContent>
     </Dialog>
   );
