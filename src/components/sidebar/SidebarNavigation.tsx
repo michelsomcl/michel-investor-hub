@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { Users, Tag, BarChartBig, Calendar } from "lucide-react";
+import { Users, Tag, BarChartBig, Calendar, ListChecks } from "lucide-react";
 import { SidebarLink } from "./SidebarLink";
 
 export const SidebarNavigation: React.FC = () => {
@@ -24,6 +24,9 @@ export const SidebarNavigation: React.FC = () => {
         </SidebarLink>
         <SidebarLink to="/calendar" icon={Calendar} isActive={isActive("/calendar")}>
           Calendário
+        </SidebarLink>
+        <SidebarLink to="/tasks" icon={ListChecks} isActive={isActive("/tasks")}>
+          Tarefas
         </SidebarLink>
       </ul>
     </nav>

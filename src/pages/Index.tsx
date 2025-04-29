@@ -5,7 +5,6 @@ import { Client } from "../types";
 import { getClients, getTags, initializeLocalStorage } from "../services/localStorage";
 import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { SummaryCards } from "../components/dashboard/SummaryCards";
-import { ActionButtons } from "../components/dashboard/ActionButtons";
 import { FilteredClientsList } from "../components/dashboard/FilteredClientsList";
 import { RecentClientsCard } from "../components/dashboard/RecentClientsCard";
 import { TagsCard } from "../components/dashboard/TagsCard";
@@ -112,8 +111,6 @@ const Index = () => {
           activeFilter={activeFilter}
           onCardClick={handleCardClick}
         />
-
-        <ActionButtons />
 
         <FilteredClientsList 
           activeFilter={activeFilter}

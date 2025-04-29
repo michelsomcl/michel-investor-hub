@@ -17,6 +17,7 @@ const CalendarPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [taskDates, setTaskDates] = useState<Date[]>([]);
 
   // Load all clients and their tasks from localStorage
   useEffect(() => {
@@ -25,16 +26,26 @@ const CalendarPage = () => {
 
     // Extract all tasks from all clients
     const allTasks: Task[] = [];
+    const allTaskDates: Date[] = [];
+    
     loadedClients.forEach(client => {
       client.tasks.forEach(task => {
-        allTasks.push({
+        const enhancedTask = {
           ...task,
           clientName: client.name
-        } as Task & { clientName: string });
+        } as Task & { clientName: string };
+        
+        allTasks.push(enhancedTask);
+        
+        // Add task date to taskDates array for marking in calendar
+        if (task.dueDate) {
+          allTaskDates.push(new Date(task.dueDate));
+        }
       });
     });
 
     setTasks(allTasks);
+    setTaskDates(allTaskDates);
   }, []);
 
   // Filter tasks based on selected date and view
@@ -78,6 +89,15 @@ const CalendarPage = () => {
     return client ? client.name : "Cliente não encontrado";
   };
 
+  // Function to check if a date has tasks
+  const hasTasksOnDate = (date: Date): boolean => {
+    return taskDates.some(taskDate => 
+      taskDate.getDate() === date.getDate() && 
+      taskDate.getMonth() === date.getMonth() && 
+      taskDate.getFullYear() === date.getFullYear()
+    );
+  };
+
   // Render different views based on the selected view type
   const renderTasksList = () => {
     if (filteredTasks.length === 0) {
@@ -116,6 +136,19 @@ const CalendarPage = () => {
     );
   };
 
+  // Custom modifiers for the calendar to mark dates with tasks
+  const modifiers = {
+    hasTasks: taskDates.map(date => new Date(date))
+  };
+
+  // Custom styles for days with tasks
+  const modifiersStyles = {
+    hasTasks: {
+      color: "white",
+      backgroundColor: "#1e40af"
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -147,6 +180,16 @@ const CalendarPage = () => {
                     selected={selectedDate}
                     onSelect={(date) => date && setSelectedDate(date)}
                     className="border-0"
+                    modifiers={{
+                      hasTasks: (date) => hasTasksOnDate(date)
+                    }}
+                    modifiersStyles={{
+                      hasTasks: { 
+                        backgroundColor: "#1e40af", 
+                        color: "white",
+                        fontWeight: "bold"
+                      }
+                    }}
                   />
                 </CardContent>
               </Card>
