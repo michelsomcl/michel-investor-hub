@@ -1,19 +1,26 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { ClientForm } from "../components/ClientForm";
 import { Client, Tag } from "../types";
-import { mockClients, mockTags } from "../data/mockData";
 import { toast } from "@/hooks/use-toast";
+import { getClients, saveClients, getTags } from "../services/localStorage";
 
 const NewClient = () => {
   const navigate = useNavigate();
-  const [availableTags, setAvailableTags] = useState<Tag[]>(mockTags);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+
+  // Load tags from localStorage when component mounts
+  useEffect(() => {
+    const loadedTags = getTags();
+    setAvailableTags(loadedTags);
+  }, []);
 
   const handleSubmit = (client: Client) => {
-    // In a real app, this would send data to an API
-    mockClients.push(client);
+    // Get current clients and add the new one
+    const currentClients = getClients();
+    saveClients([...currentClients, client]);
     
     toast({
       title: "Cliente adicionado",
@@ -24,9 +31,8 @@ const NewClient = () => {
   };
   
   const handleCreateTag = (tag: Tag) => {
-    // In a real app, this would send data to an API
-    mockTags.push(tag);
-    setAvailableTags([...mockTags]);
+    // Update state with new tag
+    setAvailableTags(prevTags => [...prevTags, tag]);
     
     toast({
       title: "Tag criada",
