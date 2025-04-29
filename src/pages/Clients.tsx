@@ -142,20 +142,19 @@ const Clients = () => {
             
             <div className="flex gap-2">
               <Select 
-                value={selectedTagId || ""} 
-                onValueChange={value => handleTagChange(value || null)}
+                value={selectedTagId || "all-tags"} 
+                onValueChange={value => handleTagChange(value === "all-tags" ? null : value)}
               >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filtrar por tag" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as tags</SelectItem>
+                  <SelectItem value="all-tags">Todas as tags</SelectItem>
                   {mockTags.map(tag => (
                     <SelectItem key={tag.id} value={tag.id}>
                       <div className="flex items-center gap-2">
                         <span 
-                          className="w-2 h-2 rounded-full" 
-                          style={{ backgroundColor: tag.color }}
+                          className="w-2 h-2 rounded-full bg-primary" 
                         />
                         {tag.name}
                       </div>
@@ -165,14 +164,14 @@ const Clients = () => {
               </Select>
               
               <Select 
-                value={selectedLevel || ""} 
-                onValueChange={value => handleLevelChange(value || null)}
+                value={selectedLevel || "all-levels"} 
+                onValueChange={value => handleLevelChange(value === "all-levels" ? null : value)}
               >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Filtrar por nível" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os níveis</SelectItem>
+                  <SelectItem value="all-levels">Todos os níveis</SelectItem>
                   <SelectItem value="Lead">Lead</SelectItem>
                   <SelectItem value="Cliente">Cliente</SelectItem>
                 </SelectContent>
@@ -191,12 +190,7 @@ const Clients = () => {
               )}
               
               {selectedTagId && (
-                <Badge 
-                  style={{
-                    backgroundColor: mockTags.find(t => t.id === selectedTagId)?.color
-                  }}
-                  className="text-white"
-                >
+                <Badge className="bg-primary text-white">
                   {mockTags.find(t => t.id === selectedTagId)?.name}
                 </Badge>
               )}
