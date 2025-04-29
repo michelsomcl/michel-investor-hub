@@ -1,7 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout } from "../components/Layout";
-import { mockTags } from "../data/mockData";
 import { Tag } from "../types";
 import {
   Dialog,
@@ -14,13 +13,20 @@ import { toast } from "@/hooks/use-toast";
 import { TagsHeader } from "../components/TagsHeader";
 import { TagsList } from "../components/TagsList";
 import { TagForm } from "../components/TagForm";
+import { getTags, saveTags } from "../services/localStorage";
 
 const Tags = () => {
-  const [tags, setTags] = useState<Tag[]>(mockTags);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [tagName, setTagName] = useState("");
   
+  // Carregar tags do localStorage quando o componente montar
+  useEffect(() => {
+    const storedTags = getTags();
+    setTags(storedTags);
+  }, []);
+
   const handleAddTag = () => {
     setTagName("");
     setEditingTag(null);
@@ -34,7 +40,9 @@ const Tags = () => {
   };
   
   const handleDeleteTag = (tagId: string) => {
-    setTags(tags.filter(tag => tag.id !== tagId));
+    const updatedTags = tags.filter(tag => tag.id !== tagId);
+    setTags(updatedTags);
+    saveTags(updatedTags);
     
     toast({
       title: "Tag excluída",
@@ -47,13 +55,15 @@ const Tags = () => {
     
     if (!tagName.trim()) return;
     
+    let updatedTags: Tag[];
+    
     if (editingTag) {
       // Update existing tag
-      setTags(tags.map(tag => 
+      updatedTags = tags.map(tag => 
         tag.id === editingTag.id 
           ? { ...tag, name: tagName.trim() } 
           : tag
-      ));
+      );
       
       toast({
         title: "Tag atualizada",
@@ -67,7 +77,7 @@ const Tags = () => {
         createdAt: new Date()
       };
       
-      setTags([...tags, newTag]);
+      updatedTags = [...tags, newTag];
       
       toast({
         title: "Tag criada",
@@ -75,6 +85,9 @@ const Tags = () => {
       });
     }
     
+    // Atualizar estado e salvar no localStorage
+    setTags(updatedTags);
+    saveTags(updatedTags);
     setIsDialogOpen(false);
   };
   

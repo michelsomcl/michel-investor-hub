@@ -9,6 +9,7 @@ import {
 import { Tag } from "../types";
 import { generateId } from "../lib/utils";
 import { TagForm } from "./TagForm";
+import { saveTags, getTags } from "../services/localStorage";
 
 interface QuickTagModalProps {
   isOpen: boolean;
@@ -29,6 +30,10 @@ export const QuickTagModal = ({ isOpen, onClose, onCreateTag }: QuickTagModalPro
       name: tagName.trim(),
       createdAt: new Date()
     };
+    
+    // Atualizar localStorage
+    const currentTags = getTags();
+    saveTags([...currentTags, newTag]);
     
     onCreateTag(newTag);
     resetForm();

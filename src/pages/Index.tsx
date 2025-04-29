@@ -1,45 +1,59 @@
 
-// Update the Import statements to replace any tag color references
 import React, { useEffect, useState } from "react";
 import { Layout } from "../components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
-import { ClientLevel, Tag } from "../types";
-import { mockClients, mockTags } from "../data/mockData";
+import { ClientLevel, Tag, Client } from "../types";
 import { Calendar, Clock, ListChecks, Tags, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getClients, getTags, initializeLocalStorage } from "../services/localStorage";
+import { ClientList } from "../components/ClientList";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [totalClients, setTotalClients] = useState(0);
   const [totalLeads, setTotalLeads] = useState(0);
   const [clientsToday, setClientsToday] = useState(0);
   const [pendingTasks, setPendingTasks] = useState(0);
-  const [recentClients, setRecentClients] = useState(mockClients.slice(0, 5));
+  const [recentClients, setRecentClients] = useState<Client[]>([]);
+  const [allClients, setAllClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [filterTitle, setFilterTitle] = useState<string>("");
   
   useEffect(() => {
+    // Inicializar localStorage
+    initializeLocalStorage();
+    
+    // Carregar dados do localStorage
+    const clients = getClients();
+    setAllClients(clients);
+    
     // Count clients
-    setTotalClients(mockClients.length);
+    setTotalClients(clients.length);
     
     // Count leads
-    setTotalLeads(mockClients.filter(client => client.level === "Lead").length);
+    setTotalLeads(clients.filter(client => client.level === "Lead").length);
     
     // Count clients added today
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    setClientsToday(mockClients.filter(client => {
+    setClientsToday(clients.filter(client => {
       const clientDate = new Date(client.createdAt);
       clientDate.setHours(0, 0, 0, 0);
       return clientDate.getTime() === today.getTime();
     }).length);
     
     // Count pending tasks
-    const totalPendingTasks = mockClients.reduce((total, client) => {
+    const totalPendingTasks = clients.reduce((total, client) => {
       return total + client.tasks.filter(task => !task.completed).length;
     }, 0);
     setPendingTasks(totalPendingTasks);
     
     // Sort clients by most recently added
-    const sortedClients = [...mockClients].sort((a, b) => 
+    const sortedClients = [...clients].sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     setRecentClients(sortedClients.slice(0, 5));
@@ -49,9 +63,13 @@ const Index = () => {
     title: string, 
     value: number | string,
     icon: React.ReactNode,
-    color: string
+    color: string,
+    filterKey: string
   ) => (
-    <Card className="border card-hover">
+    <Card 
+      className={`border card-hover cursor-pointer ${activeFilter === filterKey ? 'ring-2 ring-primary' : ''}`}
+      onClick={() => handleCardClick(filterKey, title)}
+    >
       <CardContent className="p-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
@@ -67,6 +85,54 @@ const Index = () => {
       </CardContent>
     </Card>
   );
+
+  const handleCardClick = (filterKey: string, title: string) => {
+    if (activeFilter === filterKey) {
+      // Desativar filtro se o mesmo card for clicado novamente
+      setActiveFilter(null);
+      setFilteredClients([]);
+      setFilterTitle("");
+      return;
+    }
+
+    setActiveFilter(filterKey);
+    setFilterTitle(title);
+    
+    let filtered: Client[] = [];
+    
+    switch(filterKey) {
+      case 'totalClients':
+        filtered = [...allClients];
+        break;
+      case 'totalLeads':
+        filtered = allClients.filter(client => client.level === 'Lead');
+        break;
+      case 'clientsToday':
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        filtered = allClients.filter(client => {
+          const clientDate = new Date(client.createdAt);
+          clientDate.setHours(0, 0, 0, 0);
+          return clientDate.getTime() === today.getTime();
+        });
+        break;
+      case 'pendingTasks':
+        filtered = allClients.filter(client => 
+          client.tasks.some(task => !task.completed)
+        );
+        break;
+      default:
+        filtered = [];
+    }
+    
+    setFilteredClients(filtered);
+  };
+
+  const clearFilter = () => {
+    setActiveFilter(null);
+    setFilteredClients([]);
+    setFilterTitle("");
+  };
   
   return (
     <Layout>
@@ -83,27 +149,55 @@ const Index = () => {
             "Total de Clientes",
             totalClients,
             <Users size={20} className="text-blue-600" />,
-            "blue-600"
+            "blue-600",
+            "totalClients"
           )}
           {renderSummaryCard(
             "Total de Leads",
             totalLeads,
             <Users size={20} className="text-purple-600" />,
-            "purple-600"
+            "purple-600",
+            "totalLeads"
           )}
           {renderSummaryCard(
             "Novos Hoje",
             clientsToday,
             <Calendar size={20} className="text-green-600" />,
-            "green-600"
+            "green-600",
+            "clientsToday"
           )}
           {renderSummaryCard(
             "Tarefas Pendentes",
             pendingTasks,
             <Clock size={20} className="text-orange-600" />,
-            "orange-600"
+            "orange-600",
+            "pendingTasks"
           )}
         </div>
+
+        {activeFilter && (
+          <div className="bg-white p-4 rounded-lg border">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <span>{filterTitle}</span>
+                <Badge variant="outline" className="ml-2">
+                  {filteredClients.length} {filteredClients.length === 1 ? 'resultado' : 'resultados'}
+                </Badge>
+              </h2>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={clearFilter}
+                className="text-sm flex items-center gap-1"
+              >
+                <X size={16} />
+                Limpar filtro
+              </Button>
+            </div>
+            
+            <ClientList clients={filteredClients} />
+          </div>
+        )}
         
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           <Card className="border card-hover">
@@ -117,7 +211,11 @@ const Index = () => {
               
               <div className="space-y-4">
                 {recentClients.map(client => (
-                  <div key={client.id} className="flex justify-between items-center p-3 bg-muted/40 rounded-md">
+                  <div 
+                    key={client.id} 
+                    className="flex justify-between items-center p-3 bg-muted/40 rounded-md cursor-pointer hover:bg-muted"
+                    onClick={() => navigate(`/clients/${client.id}`)}
+                  >
                     <div>
                       <div className="font-medium">{client.name}</div>
                       <div className="text-sm text-muted-foreground">
@@ -153,7 +251,7 @@ const Index = () => {
               </div>
               
               <div className="flex flex-wrap gap-2">
-                {mockTags.map((tag) => (
+                {getTags().map((tag) => (
                   <div key={tag.id} className="flex items-center">
                     <Badge className="bg-primary">
                       {tag.name}
@@ -161,7 +259,7 @@ const Index = () => {
                   </div>
                 ))}
                 
-                {mockTags.length === 0 && (
+                {getTags().length === 0 && (
                   <div className="text-center py-8 w-full">
                     <p className="text-muted-foreground">Nenhuma tag cadastrada</p>
                   </div>
