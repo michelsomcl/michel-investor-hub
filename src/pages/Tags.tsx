@@ -22,7 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash } from "lucide-react";
-import { formatDate, generateId, getRandomColor } from "../lib/utils";
+import { formatDate, generateId } from "../lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,18 +31,15 @@ const Tags = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [tagName, setTagName] = useState("");
-  const [tagColor, setTagColor] = useState(getRandomColor());
   
   const handleAddTag = () => {
     setTagName("");
-    setTagColor(getRandomColor());
     setEditingTag(null);
     setIsDialogOpen(true);
   };
   
   const handleEditTag = (tag: Tag) => {
     setTagName(tag.name);
-    setTagColor(tag.color);
     setEditingTag(tag);
     setIsDialogOpen(true);
   };
@@ -65,7 +62,7 @@ const Tags = () => {
       // Update existing tag
       setTags(tags.map(tag => 
         tag.id === editingTag.id 
-          ? { ...tag, name: tagName.trim(), color: tagColor } 
+          ? { ...tag, name: tagName.trim() } 
           : tag
       ));
       
@@ -78,7 +75,6 @@ const Tags = () => {
       const newTag: Tag = {
         id: generateId(),
         name: tagName.trim(),
-        color: tagColor,
         createdAt: new Date()
       };
       
@@ -135,10 +131,7 @@ const Tags = () => {
               <Card key={tag.id} className="card-hover">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <Badge 
-                      className="text-white py-1 px-3 text-sm"
-                      style={{ backgroundColor: tag.color }}
-                    >
+                    <Badge className="text-sm py-1 px-3">
                       {tag.name}
                     </Badge>
                     <div className="flex items-center gap-2">
@@ -163,12 +156,6 @@ const Tags = () => {
                   <p className="text-xs text-muted-foreground">
                     Criada em: {formatDate(tag.createdAt)}
                   </p>
-                  <div className="mt-2">
-                    <div 
-                      className="w-full h-6 rounded-md" 
-                      style={{ backgroundColor: tag.color }}
-                    />
-                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -193,23 +180,6 @@ const Tags = () => {
                   placeholder="Ex: VIP, Ativo, Aposentado..."
                   required
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="tagColor">Cor</Label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="color"
-                    id="tagColor"
-                    value={tagColor}
-                    onChange={(e) => setTagColor(e.target.value)}
-                    className="w-16 h-10 p-1"
-                  />
-                  <div 
-                    className="flex-1 h-10 rounded-md border"
-                    style={{ backgroundColor: tagColor }}
-                  />
-                </div>
               </div>
               
               <DialogFooter>

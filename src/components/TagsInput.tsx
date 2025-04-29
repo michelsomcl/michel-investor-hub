@@ -39,8 +39,7 @@ export const TagsInput = ({ selectedTags, availableTags, onChange, onAddTagClick
         {selectedTags.map(tag => (
           <Badge 
             key={tag.id}
-            style={{backgroundColor: tag.color}}
-            className="text-white flex items-center gap-1 py-1"
+            className="flex items-center gap-1 py-1"
           >
             {tag.name}
             <X
@@ -74,10 +73,6 @@ export const TagsInput = ({ selectedTags, availableTags, onChange, onAddTagClick
                       onSelect={() => handleSelectTag(tag.id)}
                       className="flex items-center gap-2"
                     >
-                      <span
-                        className="h-3 w-3 rounded-full"
-                        style={{ backgroundColor: tag.color }}
-                      />
                       {tag.name}
                     </CommandItem>
                   ))}

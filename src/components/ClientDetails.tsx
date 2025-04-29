@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Client, ServiceHistory, Task, Tag } from "../types";
 import { Button } from "@/components/ui/button";
@@ -81,8 +80,7 @@ export const ClientDetails = ({
             {client.tags.map((tag) => (
               <Badge 
                 key={tag.id} 
-                style={{backgroundColor: tag.color}}
-                className="text-white py-1"
+                className="py-1"
               >
                 {tag.name}
               </Badge>
