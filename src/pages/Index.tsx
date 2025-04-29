@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Layout } from "../components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,20 +23,15 @@ const Index = () => {
   const [filterTitle, setFilterTitle] = useState<string>("");
   
   useEffect(() => {
-    // Inicializar localStorage
     initializeLocalStorage();
     
-    // Carregar dados do localStorage
     const clients = getClients();
     setAllClients(clients);
     
-    // Count clients
     setTotalClients(clients.length);
     
-    // Count leads
     setTotalLeads(clients.filter(client => client.level === "Lead").length);
     
-    // Count clients added today
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     setClientsToday(clients.filter(client => {
@@ -46,13 +40,11 @@ const Index = () => {
       return clientDate.getTime() === today.getTime();
     }).length);
     
-    // Count pending tasks
     const totalPendingTasks = clients.reduce((total, client) => {
       return total + client.tasks.filter(task => !task.completed).length;
     }, 0);
     setPendingTasks(totalPendingTasks);
     
-    // Sort clients by most recently added
     const sortedClients = [...clients].sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -88,7 +80,6 @@ const Index = () => {
 
   const handleCardClick = (filterKey: string, title: string) => {
     if (activeFilter === filterKey) {
-      // Desativar filtro se o mesmo card for clicado novamente
       setActiveFilter(null);
       setFilteredClients([]);
       setFilterTitle("");
@@ -173,6 +164,17 @@ const Index = () => {
             "orange-600",
             "pendingTasks"
           )}
+        </div>
+
+        <div className="flex justify-center space-x-4 my-6">
+          <Button onClick={() => navigate('/calendar')} className="flex items-center gap-2">
+            <Calendar size={16} />
+            Ver Calendário
+          </Button>
+          <Button onClick={() => navigate('/tasks')} className="flex items-center gap-2">
+            <ListChecks size={16} />
+            Filtrar Tarefas
+          </Button>
         </div>
 
         {activeFilter && (

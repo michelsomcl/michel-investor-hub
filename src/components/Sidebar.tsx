@@ -1,6 +1,8 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Users, Tag, BarChartBig } from "lucide-react";
+import { Users, Tag, BarChartBig, Calendar } from "lucide-react";
+
 export const Sidebar = () => {
   const location = useLocation();
   const isActive = (path: string) => {
@@ -28,6 +30,12 @@ export const Sidebar = () => {
             <Link to="/tags" className={`sidebar-item ${isActive("/tags") ? "active" : ""}`}>
               <Tag size={20} />
               <span>Tags</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/calendar" className={`sidebar-item ${isActive("/calendar") ? "active" : ""}`}>
+              <Calendar size={20} />
+              <span>Calendário</span>
             </Link>
           </li>
         </ul>
