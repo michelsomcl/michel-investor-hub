@@ -25,7 +25,9 @@ const Tags = () => {
   // Carregar tags do localStorage quando o componente montar
   useEffect(() => {
     const storedTags = getTags();
-    setTags(storedTags);
+    // Sort tags alphabetically
+    const sortedTags = [...storedTags].sort((a, b) => a.name.localeCompare(b.name));
+    setTags(sortedTags);
   }, []);
 
   const handleAddTag = () => {
@@ -122,9 +124,12 @@ const Tags = () => {
       });
     }
     
+    // Sort tags alphabetically
+    const sortedTags = updatedTags.sort((a, b) => a.name.localeCompare(b.name));
+    
     // Atualizar estado e salvar no localStorage
-    setTags(updatedTags);
-    saveTags(updatedTags);
+    setTags(sortedTags);
+    saveTags(sortedTags);
     setIsDialogOpen(false);
     setError("");
   };

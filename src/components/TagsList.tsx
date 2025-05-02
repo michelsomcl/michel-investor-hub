@@ -13,7 +13,12 @@ interface TagsListProps {
 }
 
 export const TagsList = ({ tags, onEdit, onDelete, onAddTag }: TagsListProps) => {
-  if (tags.length === 0) {
+  // Sort tags alphabetically by name
+  const sortedTags = [...tags].sort((a, b) => 
+    a.name.localeCompare(b.name)
+  );
+  
+  if (sortedTags.length === 0) {
     return (
       <div className="text-center py-10">
         <p className="text-muted-foreground">Nenhuma tag cadastrada</p>
@@ -30,7 +35,7 @@ export const TagsList = ({ tags, onEdit, onDelete, onAddTag }: TagsListProps) =>
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {tags.map(tag => (
+      {sortedTags.map(tag => (
         <TagCard 
           key={tag.id} 
           tag={tag} 

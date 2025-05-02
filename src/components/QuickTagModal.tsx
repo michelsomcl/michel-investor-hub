@@ -51,8 +51,12 @@ export const QuickTagModal = ({ isOpen, onClose, onCreateTag }: QuickTagModalPro
       createdAt: new Date()
     };
     
+    // Get current tags, add the new one, and sort alphabetically
+    const updatedTags = [...currentTags, newTag]
+      .sort((a, b) => a.name.localeCompare(b.name));
+    
     // Atualizar localStorage
-    saveTags([...currentTags, newTag]);
+    saveTags(updatedTags);
     
     onCreateTag(newTag);
     resetForm();
