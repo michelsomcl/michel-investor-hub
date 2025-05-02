@@ -10,6 +10,7 @@ import { Tag } from "../types";
 import { generateId } from "../lib/utils";
 import { TagForm } from "./TagForm";
 import { saveTags, getTags } from "../services/localStorage";
+import { toast } from "@/hooks/use-toast";
 
 interface QuickTagModalProps {
   isOpen: boolean;
@@ -19,20 +20,38 @@ interface QuickTagModalProps {
 
 export const QuickTagModal = ({ isOpen, onClose, onCreateTag }: QuickTagModalProps) => {
   const [tagName, setTagName] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!tagName.trim()) return;
     
+    const trimmedName = tagName.trim();
+    
+    // Check if tag already exists
+    const currentTags = getTags();
+    const tagExists = currentTags.some(tag => 
+      tag.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+    
+    if (tagExists) {
+      setError("Tag já cadastrada");
+      toast({
+        title: "Erro",
+        description: "Tag já cadastrada",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const newTag: Tag = {
       id: generateId(),
-      name: tagName.trim(),
+      name: trimmedName,
       createdAt: new Date()
     };
     
     // Atualizar localStorage
-    const currentTags = getTags();
     saveTags([...currentTags, newTag]);
     
     onCreateTag(newTag);
@@ -42,6 +61,7 @@ export const QuickTagModal = ({ isOpen, onClose, onCreateTag }: QuickTagModalPro
   
   const resetForm = () => {
     setTagName("");
+    setError("");
   };
   
   const handleClose = () => {
@@ -62,6 +82,7 @@ export const QuickTagModal = ({ isOpen, onClose, onCreateTag }: QuickTagModalPro
           onSubmit={handleSubmit}
           onClose={handleClose}
           isEditing={false}
+          error={error}
         />
       </DialogContent>
     </Dialog>

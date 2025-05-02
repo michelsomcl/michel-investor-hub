@@ -20,6 +20,7 @@ const Tags = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [tagName, setTagName] = useState("");
+  const [error, setError] = useState("");
   
   // Carregar tags do localStorage quando o componente montar
   useEffect(() => {
@@ -30,12 +31,14 @@ const Tags = () => {
   const handleAddTag = () => {
     setTagName("");
     setEditingTag(null);
+    setError("");
     setIsDialogOpen(true);
   };
   
   const handleEditTag = (tag: Tag) => {
     setTagName(tag.name);
     setEditingTag(tag);
+    setError("");
     setIsDialogOpen(true);
   };
   
@@ -55,25 +58,59 @@ const Tags = () => {
     
     if (!tagName.trim()) return;
     
+    const trimmedName = tagName.trim();
+    
     let updatedTags: Tag[];
+    let tagExists = false;
     
     if (editingTag) {
+      // Check if another tag with same name exists (when editing)
+      tagExists = tags.some(
+        tag => tag.id !== editingTag.id && 
+        tag.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+      
+      if (tagExists) {
+        setError("Tag já cadastrada");
+        toast({
+          title: "Erro",
+          description: "Tag já cadastrada",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Update existing tag
       updatedTags = tags.map(tag => 
         tag.id === editingTag.id 
-          ? { ...tag, name: tagName.trim() } 
+          ? { ...tag, name: trimmedName } 
           : tag
       );
       
       toast({
         title: "Tag atualizada",
-        description: `A tag "${tagName}" foi atualizada com sucesso.`
+        description: `A tag "${trimmedName}" foi atualizada com sucesso.`
       });
     } else {
+      // Check if tag with same name already exists (when creating new)
+      tagExists = tags.some(
+        tag => tag.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+      
+      if (tagExists) {
+        setError("Tag já cadastrada");
+        toast({
+          title: "Erro",
+          description: "Tag já cadastrada",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Create new tag
       const newTag: Tag = {
         id: generateId(),
-        name: tagName.trim(),
+        name: trimmedName,
         createdAt: new Date()
       };
       
@@ -81,7 +118,7 @@ const Tags = () => {
       
       toast({
         title: "Tag criada",
-        description: `A tag "${tagName}" foi criada com sucesso.`
+        description: `A tag "${trimmedName}" foi criada com sucesso.`
       });
     }
     
@@ -89,11 +126,13 @@ const Tags = () => {
     setTags(updatedTags);
     saveTags(updatedTags);
     setIsDialogOpen(false);
+    setError("");
   };
   
   const handleClose = () => {
     setIsDialogOpen(false);
     setEditingTag(null);
+    setError("");
   };
 
   return (
@@ -122,6 +161,7 @@ const Tags = () => {
               onSubmit={handleDialogSubmit}
               onClose={handleClose}
               isEditing={!!editingTag}
+              error={error}
             />
           </DialogContent>
         </Dialog>

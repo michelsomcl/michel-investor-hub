@@ -3,9 +3,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { DialogFooter } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface TagFormProps {
   tagName: string;
@@ -13,9 +12,17 @@ interface TagFormProps {
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
   isEditing: boolean;
+  error?: string;
 }
 
-export const TagForm = ({ tagName, setTagName, onSubmit, onClose, isEditing }: TagFormProps) => {
+export const TagForm = ({ 
+  tagName, 
+  setTagName, 
+  onSubmit, 
+  onClose, 
+  isEditing,
+  error
+}: TagFormProps) => {
   return (
     <form onSubmit={onSubmit} className="space-y-4 py-4">
       <div className="space-y-2">
@@ -28,6 +35,12 @@ export const TagForm = ({ tagName, setTagName, onSubmit, onClose, isEditing }: T
           required
         />
       </div>
+      
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose}>
