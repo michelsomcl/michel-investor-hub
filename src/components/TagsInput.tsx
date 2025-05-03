@@ -29,14 +29,19 @@ export const TagsInput = ({ selectedTags, availableTags, onChange, onAddTagClick
     setOpen(false);
   };
   
-  const availableUnselectedTags = availableTags.filter(
-    tag => !selectedTags.some(selectedTag => selectedTag.id === tag.id)
+  // Sort the selected tags alphabetically
+  const sortedSelectedTags = [...selectedTags].sort((a, b) => 
+    a.name.localeCompare(b.name)
   );
+  
+  const availableUnselectedTags = availableTags
+    .filter(tag => !selectedTags.some(selectedTag => selectedTag.id === tag.id))
+    .sort((a, b) => a.name.localeCompare(b.name)); // Sort available tags alphabetically
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2 p-2 border rounded-md min-h-10">
-        {selectedTags.map(tag => (
+        {sortedSelectedTags.map(tag => (
           <Badge 
             key={tag.id}
             className="flex items-center gap-1 py-1"

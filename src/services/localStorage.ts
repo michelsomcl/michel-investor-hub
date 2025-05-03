@@ -38,6 +38,24 @@ export const getClients = (): Client[] => {
 
 export const saveTags = (tags: Tag[]): void => {
   localStorage.setItem(TAGS_KEY, JSON.stringify(tags));
+  
+  // Update the tags in all clients
+  const clients = getClients();
+  const updatedClients = clients.map(client => {
+    // Update client tags with the latest tag information
+    const updatedTags = client.tags.map(clientTag => {
+      const updatedTag = tags.find(t => t.id === clientTag.id);
+      return updatedTag || clientTag;
+    });
+    
+    return {
+      ...client,
+      tags: updatedTags
+    };
+  });
+  
+  // Save the updated clients
+  saveClients(updatedClients);
 };
 
 export const getTags = (): Tag[] => {

@@ -39,7 +39,12 @@ export const ClientList = ({ clients }: ClientListProps) => {
     window.location.reload();
   };
 
-  if (clients.length === 0) {
+  // Sort clients alphabetically by name
+  const sortedClients = [...clients].sort((a, b) => 
+    a.name.localeCompare(b.name)
+  );
+
+  if (sortedClients.length === 0) {
     return (
       <div className="text-center py-10">
         <p className="text-muted-foreground">Nenhum cliente encontrado</p>
@@ -62,7 +67,7 @@ export const ClientList = ({ clients }: ClientListProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {clients.map((client) => (
+          {sortedClients.map((client) => (
             <TableRow 
               key={client.id}
               className="cursor-pointer hover:bg-muted/50"

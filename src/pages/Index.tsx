@@ -7,7 +7,7 @@ import { DashboardHeader } from "../components/dashboard/DashboardHeader";
 import { SummaryCards } from "../components/dashboard/SummaryCards";
 import { FilteredClientsList } from "../components/dashboard/FilteredClientsList";
 import { RecentClientsCard } from "../components/dashboard/RecentClientsCard";
-import { TagsCard } from "../components/dashboard/TagsCard";
+import { MiniCalendarCard } from "../components/dashboard/MiniCalendarCard";
 
 const Index = () => {
   const [totalClients, setTotalClients] = useState(0);
@@ -19,7 +19,6 @@ const Index = () => {
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [filterTitle, setFilterTitle] = useState<string>("");
-  const [tags, setTags] = useState(getTags());
   
   useEffect(() => {
     initializeLocalStorage();
@@ -48,9 +47,6 @@ const Index = () => {
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     setRecentClients(sortedClients.slice(0, 5));
-    
-    // Refresh tags
-    setTags(getTags());
   }, []);
   
   const handleCardClick = (filterKey: string, title: string) => {
@@ -121,7 +117,7 @@ const Index = () => {
         
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           <RecentClientsCard recentClients={recentClients} />
-          <TagsCard tags={tags} />
+          <MiniCalendarCard />
         </div>
       </div>
     </Layout>
